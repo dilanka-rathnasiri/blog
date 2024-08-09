@@ -1,5 +1,7 @@
 ## Deploying Kubernetes dashboard on a Kubernetes cluster
 
+> cover image: Photo by <a href="https://unsplash.com/@jbcreate_?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Joseph Barrientos</a> on <a href="https://unsplash.com/photos/ship-helm-eUMEWE-7Ewg?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
+
 In this article,
 we will talk about deploying [Kubernetes dashboard](https://github.com/kubernetes/dashboard) on a Kubernetes cluster.
 Kubernetes dashboard is the official web user interface for getting overview of a kubernetes cluster.
@@ -16,6 +18,35 @@ Execute the following commands in a terminal for installation.
 helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
 # Deploy a Helm Release named "kubernetes-dashboard" using the kubernetes-dashboard chart
 helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
+```
+
+We'll get a reply similar to the following.
+
+***Reply-A:***
+```shell
+Release "kubernetes-dashboard" does not exist. Installing it now.
+NAME: kubernetes-dashboard
+LAST DEPLOYED: Fri Aug  9 20:35:55 2024
+NAMESPACE: kubernetes-dashboard
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+*************************************************************************************************
+*** PLEASE BE PATIENT: Kubernetes Dashboard may need a few minutes to get up and become ready ***
+*************************************************************************************************
+
+Congratulations! You have just installed Kubernetes Dashboard in your cluster.
+
+To access Dashboard run:
+  kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
+
+NOTE: In case port-forward command does not work, make sure that kong service name is correct.
+      Check the services in Kubernetes Dashboard namespace using:
+        kubectl -n kubernetes-dashboard get svc
+
+Dashboard will be available at:
+  https://localhost:8443 # ‼ note down this url for accessing the dashboard
 ```
 
 ## Create a user for accessing kubernetes dashboard
@@ -48,26 +79,26 @@ They are,
   - Provides superuser access to do anything on any resource.
 - admin
   - Provides permissions to do most of the actions on most of the resources.
-  - It doesn't give the permission for followings,
+  - It doesn't give the permission for the following,
     - write access to the resource quota or to the namespace itself
     - write access to EndpointSlices (or Endpoints)
 - edit
   - Provides permission to read and write access for most of the resources
-  - It doesn't give the permission for followings,
+  - It doesn't give the permission for the following,
     - viewing or modifying roles or role bindings
-    - permissions weren't provided by admin cluster role
+    - permissions aren't provided by the admin cluster role
 - view
   - Provides read-only access for most of the resources
-  - It doesn't give the permission for followings,
+  - It doesn't give the permission for the following,
     - viewing roles or role bindings
     - viewing Secrets
-    - permissions weren't provided by view cluster role
+    - permissions aren't provided by the edit cluster role
 
 Since great power comes with great responsibility, it is good to use minimum permission as possible.
 
 ![Uncle Ben advice](https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExdXByam4wdWpsZzFydnlkaXg1ejNsZHR0b2MzdTd2enViZnVoY2N2OCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/10KIsXhwdoerHW/giphy.gif)
 
-In this example kubernetes configuration YAML files, we use admin cluster role.
+In this example kubernetes configuration, we use the predefined admin cluster role.
 
 ***Cluster Role Binding:*** 
 Cluster role binding attaches a cluster role to a service account.
@@ -98,26 +129,29 @@ kubectl -n kubernetes-dashboard create token admin-user
 
 ## Accessing kubernetes dashboard
 
-There are two ways for accessing kubernetes dashboard.
+There are two ways of accessing kubernetes dashboard.
 
-1. kubectl port-forward
+1. kubectl port-forward **(I prefer this way)**
    - execute the following command in the terminal,
        ```shell
        kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
        ```
-   - Now we can access kubernetes dashboard from `http://localhost:8443`
+   - Now we can access kubernetes dashboard from `https://localhost:8443` **(url in Reply-A)**
+   - We use https for accessing, because the url in Reply-A is a https request
+   - If the url in Reply-A is a http request, we have to access the kubernetes dashboard with http
+   - Since we'll get a short url, I prefer this method.
 
 2. kubectl proxy
-  - execute the following command in the terminal,
-    ```shell
-     kubectl proxy --port=8001
-     ```
-  - Now we can access kubernetes dashboard
-    from `http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard-kong-proxy:443/proxy`
+   - execute the following command in the terminal,
+     ```shell
+      kubectl proxy --port=8001
+      ```
+   - Now we can access kubernetes dashboard
+     from `http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard-kong-proxy:443/proxy/`
 
 ## Create long-lived Bearer Token for accessing Kubernetes dashboard
 
-We can create a token and save it as a secret with the following YAML configuration file.
+We can create a token and save it as a secret with the following YAML configuration.
 
 ```yaml
 apiVersion: v1
@@ -147,10 +181,16 @@ kubectl get secret admin-user -n kubernetes-dashboard -o jsonpath={".data.token"
 </svg>&nbsp;&nbsp;simple-k8s](https://github.com/dilanka-rathnasiri/simple-k8s)
 
 This GitHub project is an example of Infrastructure as Code with [Pulumi](https://www.pulumi.com) for Kubernetes dashboard deployment.
+Since this article isn't focusing on Infrastructure as Code, we'll not discuss the code here.
+But I'll think this will be helpful for getting a rough idea.
 
 ## Summary
-In this article, we have discussed deploying Kubernetes dashboard on a Kubernetes cluster.
+In this article, we’ve discussed deploying Kubernetes dashboard on a Kubernetes cluster.
 Kubernetes dashboard is one of the easiest ways to get an overview of a kubernetes cluster.
+Hands-on experience of the Kubernetes dashboard is valuable on the learning Kubernetes.
+Also, it'll be a good jumpstart.
+Even though the Kubernetes dashboard provides an overview of the cluster to some extent,
+I think it'll not be enough for an advanced production Kubernetes cluster.
 
 ## References
 1. https://github.com/kubernetes/dashboard/blob/master/docs/user/accessing-dashboard/README.md
