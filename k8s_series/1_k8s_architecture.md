@@ -137,7 +137,7 @@ In my opinion, for a simple production system, Kubernetes is unnecessary. But fo
 ## Summary
 In this article, we explored the architecture of Kubernetes. Understanding the architecture and components of Kubernetes will be valuable for a solid foundation of Kubernetes. Also, I encourage you to get hands-on experience with Kubernetes. [MiniKube](https://minikube.sigs.k8s.io/docs) will be a good starting point for that.
 
-## Reference
+## References
 - https://kubernetes.io/docs/concepts/architecture
 - https://www.redhat.com/en/topics/containers/kubernetes-architecture
 - https://kubernetes.io/docs/setup/production-environment
