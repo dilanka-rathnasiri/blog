@@ -2,7 +2,7 @@
 
 > cover image: Photo by <a href="https://unsplash.com/@ilangamuwa?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Nilantha Ilangamuwa</a> on <a href="https://unsplash.com/photos/ship-on-dock-near-shipping-containers-d3766qQNQIY?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
 
-In this article, we’ll talk about Kubernetes pods. We will discuss what they are, how they work, and why they’re essential in the Kubernetes ecosystem.
+In this article, we’ll talk about Kubernetes pods. We'll discuss what they are, how they work, and why they’re essential in the Kubernetes ecosystem.
 
 ## What are Kubernetes Objects?
 
@@ -20,9 +20,9 @@ In this article, we’ll talk about Kubernetes pods. We will discuss what they a
 * In Kubernetes, pods are the smallest deployable units of computing
 * Kubernetes pod is one type of the Kubernetes objects
 * A pod can contain one container or a group of tightly coupled containers
+* So, Pods can be considered as abstractions that encapsulate one or more containers
+* In most use cases, we use pods that contain a single container
 * Pods are ephemeral and disposable
-* So, Pods can be viewed as abstractions that encapsulate one or more containers
-* In most use cases, each pod contains a single container
 
 ## Creating a Pod with a Manifest File
 
@@ -40,15 +40,20 @@ spec:
     - containerPort: 80
 ```
 
-Then we can create this pod using [kubectl](https://kubernetes.io/docs/reference/kubectl) with the following command
+Then we can create this pod using [kubectl](https://kubernetes.io/docs/reference/kubectl) with one of the following commands
 ```shell
 kubectl create -f nginx.yaml
 ```
+or
+```shell
+kubectl apply -f nginx.yaml
+```
 
 * The above manifest file creates a pod with a single nginx container
+* In many use cases, we don't directly create and manipulate pods
 * Instead, we’ll use [workload resources](https://kubernetes.io/docs/concepts/workloads) like Deployments or ReplicaSets to manage pods at scale
 
-We can delete a created pod using kubectl with one of the following command
+We can delete above pod using kubectl with one of the following commands
 ```shell
 kubectl delete -f nginx.yaml
 ```
@@ -59,7 +64,7 @@ kubectl delete pod nginx
 
 ## Multi-container pods
 
-* Container required to work together can be encapsulated in to a single pod
+* Containers that are tightly coupled and required to work together can be encapsulated into a single pod
 * These containers are automatically **co-located** and **co-scheduled** in the same physical or virtual machine
 * So, this allows them to
   * communicate and coordinate with each other
@@ -78,7 +83,7 @@ spec:
     ports:
     - containerPort: 80
   - name: redis
-    image: redis
+    image: redis:latest
     ports:
     - containerPort: 6379
 ```
@@ -101,16 +106,16 @@ spec:
 ## Init Container
 
 * Init container is a container that runs before the main application containers of the pod
-* They’re used for tasks required to be completed once before the application containers startup
+* They’re used for tasks required to be completed once before the application container startup
 * Init containers are also regular containers
 * But unlike regular containers,
   * Init containers always run to completion
   * Init containers run only at the pod startup
 * A pod can have multiple init containers and they execute sequentially
 * Init containers are specified within the `initContainers` section of the manifest file
-* Init container run sequentially in the order of `initContainers` section of the manifest file
-* Only one init container runs at a time 
-* If an init container fails, it will be restarted until succeeded
+* Init containers run sequentially in the order of `initContainers` section of the manifest file
+* Only one init container runs at a time
+* If an init container fails, it'll be restarted until it succeeds
 * However, we can control the restart behavior by using `restartPolicy` of the pod
 * If an init container fails, the whole pod will fail
 
@@ -137,9 +142,9 @@ spec:
 ```
 
 * In the above example `init-myservice` and `init-mydb` are init containers
-* Containers will run in the following order, 
+* Containers of the above manifest run in the following order,
   1. `init-myservice` init container starts first and runs to completion
-  2. After successfully completing `init-myservice` init container, `init-mydb` init container starts and runs to the completion 
+  2. After successfully completing `init-myservice` init container, `init-mydb` init container starts and runs to the completion
   3. After successfully completing `init-mydb` init container, `myapp-container` container starts
 
 ## Summary
@@ -148,7 +153,7 @@ In this article, we covered the basics of Kubernetes pods. We looked at what pod
 
 ## References
 
-1. https://kubernetes.io/docs/concepts/workloads/pods/
-2. https://kubernetes.io/docs/concepts/overview/working-with-objects/
-3. https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers/
-4. https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+1. https://kubernetes.io/docs/concepts/workloads/pods
+2. https://kubernetes.io/docs/concepts/overview/working-with-objects
+3. https://kubernetes.io/docs/concepts/workloads/pods/sidecar-containers
+4. https://kubernetes.io/docs/concepts/workloads/pods/init-containers
