@@ -119,14 +119,6 @@ spec:
 - However, we can control the restart behavior by using `restartPolicy` of the pod
 - If an init container fails, the whole pod will fail
 
-## Pod lifecycle
-
-- 
-
-## Ephemeral Containers
-
-## Distributions
-
 ## Summary
 
 ## References
