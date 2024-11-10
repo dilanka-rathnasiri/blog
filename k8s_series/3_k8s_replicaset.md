@@ -1,7 +1,5 @@
 # Kubernetes ReplicaSet
 
-## Introduction
-
 ## What is a ReplicaSet?
 
 * A ReplicaSet is a Kubernetes object that maintains a specified number of pods of a given template are running at any
@@ -115,8 +113,6 @@ kubectl delete rs my-replicaset
 
 * ReplicaSet is the next generation of Replication Controller
 * So, we don't use Replication Controller anymore
-
-## Summary
 
 ## References
 
