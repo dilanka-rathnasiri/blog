@@ -59,6 +59,9 @@ or
 kubectl delete namespace my-namespace
 ```
 
+> [!WARNING] 
+> Deleting a namespace deletes all the resources in the namespace 
+
 ## References
 
 * https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
