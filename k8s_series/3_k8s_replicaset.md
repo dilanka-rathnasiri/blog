@@ -1,16 +1,19 @@
 # Kubernetes ReplicaSet
 
+In this article, we'll talk about Kubernetes ReplicaSet.
+Being familiar with the earlier articles in this series is helpful for a better understanding.
+
 ## What is a ReplicaSet?
 
-* A ReplicaSet is a Kubernetes object that maintains a specified number of pods of a given template are running at any
+* A ReplicaSet is a Kubernetes object that ensures a specified number of pods of a given template are running at any
   given time
-* A ReplicaSet guarantees the availability of a specified number of identical pods
-* We don't directly manage ReplicaSets
+* It guarantees the availability of a specified number of identical pods
+* Most of the time, we don't directly manage ReplicaSets
 * Instead, we use [Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) for managing ReplicaSet
 
 ## Creating a ReplicaSet with a Manifest File
 
-* Understanding the manifest file of the ReplicaSet is helpful for understanding how ReplicaSet works
+* To understand how ReplicaSets work, let’s start with the manifest file
 * Here’s an example of a ReplicaSet manifest file:
 
 ```yaml
@@ -44,34 +47,37 @@ or
 kubectl apply -f my-replicaset.yaml
 ```
 
-* The above manifest file creates `my-replicaset` ReplicaSet
-* Let's discuss important fields in the above manifest file
+The above manifest file creates ReplicaSet `my-replicaset`
+
+## Key fields in the ReplicaSet manifest file
 
 * `.spec.replicas`:
   * Number of pods managed by the ReplicaSet
   * In the above ReplicaSet, we have 3 pods
   * If we don't specify a value, then the default value is 1
 * `.spec.template`:
-  * Actual pods are created from this pod template
+  * The pod template used to create the ReplicaSet’s pods
 * `.spec.template.metadata.labels` =>
   * labels of the pods created from the pod template
   * These labels must match `.spec.selector.matchLabels` labels
   * In the above ReplicaSet, the labels of the pods are `app: my-app`
 * `.spec.selector.matchLabels` =>
   * Replicaset identifies the pods required to manage by the ReplicaSet from these labels
-  * If there are pods that aren't created by the above pod template and have all the labels matches with labels in `.spec.selector.matchLabels`, then those pods will be also managed by ReplicaSet `my-replicaset`
-  * So, if we already have 2 pods with the labels `app: my-app`, then only 1 pod will be newly created by `my-replicaset` ReplicaSet
-  * But all the 3 pods with the labels `app: my-app` will be managed by ReplicaSet `my-replicaset`
-  * Also, we can use [label selectors](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/) other than matchLabels such as `matchExpressions`
-* A ReplicaSet is linked to its pods via the `metadata.ownerReferences` field of the pods
+  * ReplicaSet will manage pods with matching labels (even if not created by the ReplicaSet).
+  * e.g., if 2 pods with the label `app: my-app` already exist, the ReplicaSet will create only 1 more pod but manage all 3 pods 
+  * ReplicaSets can also use advanced [label selectors](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/) like `matchExpressions` instead of `matchLabels`.
+
+## Linking ReplicaSet to its pods
+
+* A ReplicaSet links to its pods through the `metadata.ownerReferences` field in the pod's metadata.
 * Field `metadata.ownerReferences` specifies the owner of the object
-* Following is the output YAML of a running pod which is managed by `my-replicaset` ReplicaSet
+* This field specifies the ReplicaSet `my-replicaset` as the owner
+* Here's an example output YAML of a pod managed by `my-replicaset`
 
 ```yaml
 apiVersion: v1
 kind: Pod
 metadata:
-  creationTimestamp: "2024-11-10T07:30:35Z"
   generateName: my-replicaset-
   labels:
     app: my-app
@@ -94,11 +100,9 @@ spec:
       ports:
         - containerPort: 80
           protocol: TCP
-      resources: {}
-      terminationMessagePath: /dev/termination-log
-      terminationMessagePolicy: File
-
 ```
+
+## Deleting a ReplicaSet
 
 We can delete the above ReplicaSet using kubectl with one of the following commands
 ```shell
@@ -112,7 +116,12 @@ kubectl delete rs my-replicaset
 ## Replicaset vs. Replication Controller
 
 * ReplicaSet is the next generation of Replication Controller
-* So, we don't use Replication Controller anymore
+* Kubernetes documentation recommends using ReplicaSets instead of Replications Controllers
+
+## Summary
+
+In this article, we discussed the Kubernetes ReplicaSet.
+We looked at what ReplicaSet is, how it works, and how to create and delete a ReplicaSet.
 
 ## References
 
