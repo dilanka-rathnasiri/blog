@@ -58,14 +58,14 @@ The above manifest file creates ReplicaSet `my-replicaset`
   * If we don't specify a value, then the default value is 1
 * `.spec.template`:
   * The pod template used to create the ReplicaSet’s pods
-* `.spec.template.metadata.labels` =>
+* `.spec.template.metadata.labels`:
   * labels of the pods created from the pod template
   * These labels must match `.spec.selector.matchLabels` labels
   * In the above ReplicaSet, the labels of the pods are `app: my-app`
-* `.spec.selector.matchLabels` =>
-  * Replicaset identifies the pods required to manage by the ReplicaSet from these labels
+* `.spec.selector.matchLabels`:
+  * Replicaset identifies the pods required to be managed by the ReplicaSet from these labels
   * ReplicaSet will manage pods with matching labels (even if not created by the ReplicaSet)
-  * e.g., if 2 pods with the label `app: my-app` already exist, the ReplicaSet will create only 1 more pod but manage all 3 pods 
+  * e.g., if 2 pods with the label `app: my-app` already exist, the ReplicaSet will create only 1 more pod but manage all 3 pods
   * ReplicaSets can also use advanced [label selectors](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/) like `matchExpressions` instead of `matchLabels`
 
 ## How a ReplicaSet Links to Its Pods
