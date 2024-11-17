@@ -1,7 +1,8 @@
 # Kubernetes ReplicaSet
 
-In this article, we'll talk about Kubernetes ReplicaSet.
-Being familiar with the earlier articles in this series is helpful for a better understanding.
+> cover image: Photo by <a href="https://unsplash.com/@frankiefoto?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">frank mckenna</a> on <a href="https://unsplash.com/photos/assorted-color-filed-intermodal-containers-tjX_sniNzgQ?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
+
+In this article, we'll talk about Kubernetes ReplicaSet. Being familiar with the earlier articles in this series is helpful for a better understanding.
 
 ## What Is a ReplicaSet?
 
@@ -120,8 +121,7 @@ kubectl delete rs my-replicaset
 
 ## Summary
 
-In this article, we discussed the Kubernetes ReplicaSet.
-We looked at what ReplicaSet is, how it works, and how to create and delete a ReplicaSet.
+In this article, we discussed the Kubernetes ReplicaSet. We looked at what ReplicaSet is, how it works, and how to create and delete a ReplicaSet.
 
 ## References
 
