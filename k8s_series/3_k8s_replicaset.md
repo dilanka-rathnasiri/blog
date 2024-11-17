@@ -3,7 +3,7 @@
 In this article, we'll talk about Kubernetes ReplicaSet.
 Being familiar with the earlier articles in this series is helpful for a better understanding.
 
-## What is a ReplicaSet?
+## What Is a ReplicaSet?
 
 * A ReplicaSet is a Kubernetes object that ensures a specified number of pods of a given template are running at any
   given time
@@ -11,7 +11,7 @@ Being familiar with the earlier articles in this series is helpful for a better 
 * Most of the time, we don't directly manage ReplicaSets
 * Instead, we use [Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) for managing ReplicaSet
 
-## Creating a ReplicaSet with a Manifest File
+## Creating a ReplicaSet With a Manifest File
 
 * To understand how ReplicaSets work, let’s start with the manifest file
 * Here’s an example of a ReplicaSet manifest file:
@@ -49,7 +49,7 @@ kubectl apply -f my-replicaset.yaml
 
 The above manifest file creates ReplicaSet `my-replicaset`
 
-## Key fields in the ReplicaSet manifest file
+## Key Fields in the ReplicaSet Manifest File
 
 * `.spec.replicas`:
   * Number of pods managed by the ReplicaSet
@@ -63,13 +63,13 @@ The above manifest file creates ReplicaSet `my-replicaset`
   * In the above ReplicaSet, the labels of the pods are `app: my-app`
 * `.spec.selector.matchLabels` =>
   * Replicaset identifies the pods required to manage by the ReplicaSet from these labels
-  * ReplicaSet will manage pods with matching labels (even if not created by the ReplicaSet).
+  * ReplicaSet will manage pods with matching labels (even if not created by the ReplicaSet)
   * e.g., if 2 pods with the label `app: my-app` already exist, the ReplicaSet will create only 1 more pod but manage all 3 pods 
-  * ReplicaSets can also use advanced [label selectors](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/) like `matchExpressions` instead of `matchLabels`.
+  * ReplicaSets can also use advanced [label selectors](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/) like `matchExpressions` instead of `matchLabels`
 
-## Linking ReplicaSet to its pods
+## How a ReplicaSet Links to Its Pods
 
-* A ReplicaSet links to its pods through the `metadata.ownerReferences` field in the pod's metadata.
+* A ReplicaSet links to its pods via the `metadata.ownerReferences` field in the pod's metadata.
 * Field `metadata.ownerReferences` specifies the owner of the object
 * This field specifies the ReplicaSet `my-replicaset` as the owner
 * Here's an example output YAML of a pod managed by `my-replicaset`
