@@ -2,7 +2,7 @@
 
 ## What Is a ConfigMap?
 
-* A ConfigMap is an object to store non-confidential configurations in key-value pairs format for other objects usage
+* A ConfigMap is an object to store non-confidential configurations in key-value pairs format for other objects' usage
 * So, configMap:
     * a key-value pairs storage
     * for non-confidential data
@@ -19,49 +19,126 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: game-configmap
+  name: car-configmap
 data:
-  # property-like keys; each key maps to a simple value
-  player_initial_lives: "3"
-  ui_properties_file_name: "user-interface.properties"
+  # property-like keys: each key maps to a simple value
+  porsche: "deutschland"
+  bmw: "deutschland"
+  toyota: "japan"
 
   # file-like keys
-  game.properties: |
-    enemy.types=aliens,monsters
-    player.maximum-lives=5
-  user-interface.properties: |
-    color.good=purple
-    color.bad=yellow
-    allow.textmode=true
+  car.brands: |
+    ford=usa
+    chevy=usa
+    audi=deutschland
+    pagani=italy
+    lamborghini=italy
 binaryData:
-  file_template: RGVtbwo=
+  car-bin-data: bGV4dXMsIHRveW90YSwgYm13LCBhdWRpLCBiZW56
 ```
 
 We can create this ConfigMap using [kubectl](https://kubernetes.io/docs/reference/kubectl) with one of the following commands
 ```shell
-kubectl create -f game-configmap.yaml
+kubectl create -f car-configmap.yaml
 ```
 or
 ```shell
-kubectl apply -f game-configmap.yaml
+kubectl apply -f car-configmap.yaml
 ```
 
-The above manifest file creates ConfigMap `game-configmap`
+The above manifest file creates ConfigMap `car-configmap`
 
 ## Key Fields in the ConfigMap Manifest File
 
 * `data`:
-  * contains key-value pairs
-  * contains UTF-8 strings
+  * Contains key-value pairs
+  * Values can be,
+    * property-like keys
+    * file-like keys
+  * Contains UTF-8 strings
 * `binaryData`:
-  * contains key-value pairs
-  * contains binary data as base64 encoded strings
+  * Contains key-value pairs
+  * Contains binary data as base64 encoded strings
 
 * Both `data` and `binaryData` fields are optional
 * One ConfigMap can contain both `data` and `binaryData` fields
-* Same key can't be included in both `data` and `binaryData` fields <!-- todo: check this in minikube -->
-* Key value of key-values pairs under the `data` and `binaryData` can only contain alphanumeric characters, `-`, `_`, `.`
+* Same key can't be in both `data` and `binaryData` fields
+* Also, same key can't duplicate in one of `data` or `binaryData` fields according to the YAML specification
+* Keys of key-values pairs under the `data` and `binaryData` can only contain alphanumeric characters, `-`, `_`, `.`
 
+## View values in a ConfigMap with Kubectl
+
+* Using `kubectl describe`
+
+Command:
+```shell
+kubectl describe configmaps car-configmap
+```
+
+Output:
+```text
+Name:         car-configmap
+Namespace:    default
+Labels:       <none>
+Annotations:  <none>
+
+Data
+====
+toyota:
+----
+japan
+bmw:
+----
+deutschland
+car.brands:
+----
+ford=usa
+chevy=usa
+audi=deutschland
+pagani=italy
+lamborghini=italy
+
+porsche:
+----
+deutschland
+
+BinaryData
+====
+car-bin-data: 30 bytes
+
+Events:  <none>
+```
+
+* Using `kubectl get`
+
+Command:
+```shell
+kubectl get configmaps car-configmap -o yaml
+```
+
+Output:
+```text
+apiVersion: v1
+binaryData:
+  car-bin-data: bGV4dXMsIHRveW90YSwgYm13LCBhdWRpLCBiZW56
+data:
+  bmw: deutschland
+  car.brands: |
+    ford=usa
+    chevy=usa
+    audi=deutschland
+    pagani=italy
+    lamborghini=italy
+  porsche: deutschland
+  toyota: japan
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2024-11-24T15:03:33Z"
+  name: car-configmap
+  namespace: default
+  resourceVersion: "514"
+  uid: bdeecd21-5599-4c99-97c0-4b539158ad3b
+```
 
 ## How to use a ConfigMap?
 
@@ -79,7 +156,7 @@ e.g.:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: demo-pod
+  name: car-pod
 spec:
   containers:
     - name: app
@@ -87,54 +164,68 @@ spec:
       image: busybox:latest
       envFrom:
         - configMapRef:
-            name: game-configmap
+            name: car-configmap
 ```
 
 We can inspect the pod's logs using kubectl with the following command
 ```shell
-kubectl logs demo-pod
+kubectl logs car-pod
 ```
 
-In the output log we can see ConfigMap's data has been used as environment variables in the pod
+In the output log, we can see pod has used ConfigMap's data as environment variables
 
-<!-- todo: check the output, specially for binaryData -->
-```shell
-player_initial_lives=3
-ui_properties_file_name=user-interface.properties
-game.properties=enemy.types=aliens,monsters
-player.maximum-lives=5
-color.good=purple
-color.bad=yellow
-allow.textmode=true
+```text
+....
+car.brands=ford=usa
+chevy=usa
+audi=deutschland
+pagani=italy
+lamborghini=italy
+
+porsche=deutschland
+bmw=deutschland
+toyota=japan
+....
 ```
 
-Also, we can select individual keys from a ConfigMap's data as follows. Also, note that the key of the pod's environmental variable doesn't need to be the same as ConfigMap's key. We can use a different value for the key name.
+Also, we can select individual keys from a ConfigMap's data as follows.
 
-```shell
+```yaml
 apiVersion: v1
 kind: Pod
 metadata:
-  name: demo-pod
+  name: car-pod
 spec:
   containers:
     - name: app
       command: ["/bin/sh", "-c", "printenv"]
       image: busybox:latest
       env:
-        - name: initial_val
+        - name: porsche-taycan # here we can use a different key
           valueFrom:
             configMapKeyRef:
-              name: game-config
-              key: player_initial_lives
+              name: car-configmap
+              key: porsche
+        - name: prius
+          valueFrom:
+            configMapKeyRef:
+              name: car-configmap
+              key: toyota
+
 ```
 
-Then Pod's log is as follows
+Pod's logs:
 
-```shell
-initial_val=3
+```text
+....
+prius=japan
+porsche-taycan=deutschland
+....
 ```
 
-## Using inside a container commands and arguments
+* Also, note that the pod's environmental variable key can be changed from the ConfigMap's data key
+
+## Using inside container commands and arguments
 
 e.g.:
 
@@ -146,12 +237,14 @@ metadata:
 spec:
   containers:
     - name: app
-      command: ["/bin/sh", "-c", "echo ${player_initial_lives}"]
+      command: ["/bin/sh", "-c", "echo ${bmw}"]
       image: busybox:latest
       envFrom:
         - configMapRef:
-            name: game-configmap
+            name: car-configmap
 ```
+
+<!-- todo: start from here -->
 
 ## Mounting as volumes into pods
 
