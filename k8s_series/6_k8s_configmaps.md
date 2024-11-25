@@ -244,9 +244,7 @@ spec:
             name: car-configmap
 ```
 
-<!-- todo: start from here -->
-
-## Mounting as volumes into pods
+## Mounting as a volume into a pod
 
 e.g.:
 
@@ -254,49 +252,57 @@ e.g.:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: demo-pod
+  name: car-pod
 spec:
   containers:
     - name: app
-      command: ["ls", "/etc/app-config"]
-      image: demo-app:latest
+      command: [ "ls", "/etc/app-config" ]
+      image: busybox:latest
       volumeMounts:
         - name: config
           mountPath: "/etc/app-config"
-          # readOnly: true todo: check this
+          readOnly: true
   volumes:
     - name: config
       configMap:
-        name: demo-config
+        name: car-configmap
 ```
 
 * In the above pod, 7 files are created for each key in `/etc/app-config`
+* Each file for each key contains its value
 * Also, we can specify the keys wanted to mount as follows
 
 ```yaml
 apiVersion: v1
 kind: Pod
 metadata:
-  name: demo-pod
+  name: car-pod
 spec:
   containers:
     - name: app
-      command: ["ls", "/etc/app-config"]
-      image: demo-app:latest
+      command: [ "ls", "/etc/app-config" ]
+      image: busybox:latest
       volumeMounts:
         - name: config
           mountPath: "/etc/app-config"
-          # readOnly: true todo: check this
+          readOnly: true
   volumes:
     - name: config
       configMap:
-        name: demo-config
+        name: car-configmap
         items:
-          - key: player_initial_lives
-            path: player_initial_lives
+          - key: porsche
+            path: porsche911
+          - key: bmw
+            path: bmw
 ```
 
-* In the above pod, 1 file is created for key `player_initial_lives` in path `/etc/app-config/player_initial_lives`
+* In the above pod, 2 files are created in path `/etc/app-config/`
+* Files are,
+  * `porsche911` for `porsche` key
+  * `bmw` for `bmw` key
+
+<!-- todo: start from here -->
 
 ## Optional ConfigMaps
 
