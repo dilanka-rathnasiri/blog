@@ -160,8 +160,8 @@ metadata:
 spec:
   containers:
     - name: app
-      command: ["/bin/sh", "-c", "printenv"]
       image: busybox:latest
+      command: ["/bin/sh", "-c", "printenv"]
       envFrom:
         - configMapRef:
             name: car-configmap
@@ -198,8 +198,8 @@ metadata:
 spec:
   containers:
     - name: app
-      command: ["/bin/sh", "-c", "printenv"]
       image: busybox:latest
+      command: ["/bin/sh", "-c", "printenv"]
       env:
         - name: porsche-taycan # here we can use a different key
           valueFrom:
@@ -237,8 +237,8 @@ metadata:
 spec:
   containers:
     - name: app
-      command: ["/bin/sh", "-c", "echo ${bmw}"]
       image: busybox:latest
+      command: ["/bin/sh", "-c", "echo ${bmw}"]
       envFrom:
         - configMapRef:
             name: car-configmap
@@ -256,8 +256,8 @@ metadata:
 spec:
   containers:
     - name: app
-      command: [ "ls", "/etc/app-config" ]
       image: busybox:latest
+      command: [ "ls", "/etc/app-config" ]
       volumeMounts:
         - name: config
           mountPath: "/etc/app-config"
@@ -280,8 +280,8 @@ metadata:
 spec:
   containers:
     - name: app
-      command: [ "ls", "/etc/app-config" ]
       image: busybox:latest
+      command: [ "ls", "/etc/app-config" ]
       volumeMounts:
         - name: config
           mountPath: "/etc/app-config"
@@ -302,8 +302,6 @@ spec:
   * `porsche911` for `porsche` key
   * `bmw` for `bmw` key
 
-<!-- todo: start from here -->
-
 ## Optional ConfigMaps
 
 e.g.:
@@ -312,33 +310,35 @@ e.g.:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: dapi-test-pod
+  name: car-pod
 spec:
   containers:
-    - name: test-container
-      image: gcr.io/google_containers/busybox
-      command: ["/bin/sh", "-c", "env"]
+    - name: app
+      image: busybox:latest
+      command: ["/bin/sh", "-c", "printenv"]
       env:
-        - name: SPECIAL_LEVEL_KEY
+        - name: FERARI
           valueFrom:
             configMapKeyRef:
-              name: a-config
-              key: akey
+              name: italy-configmap
+              key: ferari
               optional: true # mark the variable as optional
 ```
 
-* In the above pod, if the config map `a-config` doesn't exist or key `akey` doesn't exist, the variable `SPECIAL_LEVEL_KEY` will be empty
-* Otherwise, the variable `SPECIAL_LEVEL_KEY` will be set to the value of key `akey`
+* In the above pod, the variable `FERARI` will be empty
+  * If the config map `italy-configmap` doesn't exist or
+  * If the key `ferari` doesn't exist, 
+* Otherwise, the variable `FERARI` will be set to the value of key `ferari`
 
 ## Deleting a ConfigMap
 
-We can delete above ConfigMap using kubectl with one of the following commands
+We can delete the ConfigMap using kubectl with one of the following commands
 ```shell
-kubectl delete -f game-configmap.yaml
+kubectl delete -f car-configmap.yaml
 ```
 or
 ```shell
-kubectl delete configmap game-configmap
+kubectl delete configmap car-configmap
 ```
 
 ## Immutable ConfigMaps
@@ -351,32 +351,26 @@ e.g.:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: game-configmap
-  labels:
-    app: game
+  name: car-configmap
 data:
-  player_initial_lives: "3"
-  ui_properties_file_name: "user-interface.properties"
-  game.properties: "enemy.types=aliens,monsters"
-  player.maximum-lives: "5"
-  color.good: "purple"
-  color.bad: "yellow"
-  allow.textmode: "true"
+  porsche: "deutschland"
+  bmw: "deutschland"
+  toyota: "japan"
 immutable: true # mark the ConfigMap as immutable
 ```
 
-* So, we can't edit the ConfigMap `game-configmap` later
+* So, we can't edit the ConfigMap `car-configmap` later
 * Immutable ConfigMaps are useful for
-  * Use configs in many apps
+  * Use the same set of configs for many apps
   * Prevent accidental modifications
 
-## How do the ConfigMaps updates work?
+## How does the updating ConfigMaps work?
 
-* Worker nodes' kubelet worker processes periodically check for ConfigMaps changes
+* The worker node's kubelet worker process periodically checks for ConfigMaps changes
 * When we update values in a ConfigMaps
   * ConfigMap's data used as environment variables or command line arguments in pods won't change
   * ConfigMap's data used as mounted volumes will eventually change
-* Since worker nodes' skip checking for immutable ConfigMaps changes, immutable ConfigMaps have a performance advantage
+* Since the worker node skips checking for immutable ConfigMaps changes, immutable ConfigMaps have a performance advantage
 
 ## References
 
