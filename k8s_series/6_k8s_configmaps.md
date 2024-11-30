@@ -325,9 +325,9 @@ spec:
               optional: true # mark the variable as optional
 ```
 
-* In the above pod, the variable `FERARI` will be empty
-  * If the config map `italy-configmap` doesn't exist or
-  * If the key `ferari` doesn't exist, 
+* In the above pod, the variable `FERARI` won't exist if
+  * The config map `italy-configmap` doesn't exist or
+  * Tf the key `ferari` doesn't exist
 * Otherwise, the variable `FERARI` will be set to the value of key `ferari`
 
 ## Deleting a ConfigMap
