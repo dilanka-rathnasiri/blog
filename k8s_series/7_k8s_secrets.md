@@ -7,6 +7,7 @@
 * Secrets are stored in Kubernetes etcd data store
 * Secrets can't exceed 1 MB
 * Secrets are encoded not encrypted
+* We can encrypt data at rest as in [Encrypting Confidential Data at Rest](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/)
 
 ## Types of Secrets
 
